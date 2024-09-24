@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
+use App\Interfaces\UserRepositoryInterface;
 use Illuminate\Http\Request;
 use App\Models\User;
 
 class UserController extends Controller
 {
 
-    private $objUser;
+    private $userRepository;
 
-    public function __construct()
+    public function __construct(UserRepositoryInterface $userRepository)
     {
-        $this->objUser = new User();
+        $this->userRepository = $userRepository;
     }
 
     public function createAutor()
@@ -23,13 +24,8 @@ class UserController extends Controller
 
     public function storeAutor(UserRequest $request)
     {
-        $user = $this->objUser;
-
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = $request->password;
-
-        $user->save();
+        $data = $request->only('name','email','password');
+        $user = $this->userRepository->create(data: $data);
 
         return redirect('/books');
     }

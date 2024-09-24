@@ -11,7 +11,7 @@ class Book extends Model
 
     protected $table = 'books';
 
-    protected $filable = ['title', 'id_user', 'pages', 'price'];
+    protected $fillable = ['title', 'id_user', 'pages', 'price'];
 
     public function relUsers()
     {

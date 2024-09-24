@@ -28,7 +28,10 @@
                         <a class="nav-link active" aria-current="page" href="/books">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Lista</a>
+                        <a class="nav-link active" href="/books/create/autor">Novo Autor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/books/create">Novo Livro</a>
                     </li>
                 </ul>
             </div>
