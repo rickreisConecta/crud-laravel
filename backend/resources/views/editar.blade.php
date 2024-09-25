@@ -22,7 +22,8 @@
         <select class="form-control" name="id_user" id="id_user" required>
             @foreach ( $users as $user)
             <option value="{{ $user->id }}"
-                {{ $user->id == old('id_user', $selectedUserId) ? 'selected' : '' }}>
+                {{ $user->id == old('id_user', $selectedUserId) ? 'selected' : '' }}
+            >
                 {{ $user->name }}
             </option>
 

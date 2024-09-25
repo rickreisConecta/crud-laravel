@@ -1,0 +1,205 @@
+<template>
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h3>Editar Livro</h3>
+            </div>
+
+            <form class="card-body container mt-3">
+                <div class="mb-3">
+                    <label for="nome">Título</label>
+                    <input type="text" v-model="model.livro.title" id="nome" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="price">Preço</label>
+                    <input type="text" v-model="model.livro.price" id="price" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_user">Autor</label>
+                    <select v-model="selectedUserId" class="form-control" id="id_user" required>
+                        <option v-for="user in users" :key="user.id" :value="user.id">
+                            {{ user.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="pages">Páginas</label>
+                    <input type="number" v-model="model.livro.pages" id="pages" class="form-control"
+                        />
+                </div>
+
+                <div class="d-flex justify-content-between mb-3">
+                    <button type="button" @click="editarLivro" class="btn btn-primary">
+                        Editar
+                    </button>
+
+                    <RouterLink to="/livros" class="btn btn-info">
+                        Voltar
+                    </RouterLink>
+                </div>
+            </form>
+
+            <!-- <div
+          v-if="successMessage"
+          class="toast-container position-fixed top-0 end-0 text-center"
+        >
+          <div
+            id="successToast"
+            class="toast bg-success text-white fs-6 me-3 mt-3 custom-toast"
+            role="alert"
+          >
+            {{ successMessage }}
+          </div>
+        </div> -->
+
+            <!-- <div
+          v-if="errorMessage"
+          class="toast-container position-fixed top-0 end-0 text-center"
+        >
+          <div
+            id="errorToast"
+            class="toast bg-danger text-white fs-6 me-3 mt-3 custom-toast"
+            role="alert"
+          >
+            {{ errorMessage }}
+          </div>
+        </div> -->
+        </div>
+    </div>
+</template>
+
+<script>
+import { ref } from 'vue'
+import axios from 'axios';
+
+export default {
+    name: 'livroEditar',
+    // setup() {
+    //   const successMessage = ref('')
+    //   const errorMessage = ref('')
+
+    //   function showToast(id, message) {
+    //     const toastElemment = document.getElementById(id)
+
+    //     if (toastElemment) {
+    //       toastElemment.innerHTML = message
+    //       const toast = new bootstrap.Toast(toastElemment, {
+    //         autohide: true,
+    //         delay: 3000
+    //       })
+    //       toast.show()
+    //     }
+    //   }
+    //   return {
+    //     successMessage,
+    //     errorMessage,
+    //     showToast
+    //   }
+    // },
+    data() {
+        return {
+            bookId: '',
+            model: {
+                livro: {
+                    id_user: '',
+                    title: '',
+                    price: '',
+                    autor: '',
+                    pages: ''
+                }
+            },
+            users: [],
+            selectedUserId: ''
+        }
+    },
+    mounted() {
+        this.bookId = this.$route.params.id
+        this.getBookData(this.bookId);
+        this.getBookData(this.$route.params.id)
+        this.getAutors()
+    },
+    methods: {
+        getBookData(bookId) {
+            axios
+                .get(`http://127.0.0.1:8000/api/books/${bookId}/edit`)
+                .then((res) => {
+                    console.log(res.data)
+                    this.model.livro.title = res.data.title
+                    this.model.livro.price = res.data.price
+                    this.model.livro.autor = res.data.rel_users.name
+                    this.model.livro.pages = res.data.pages
+                    this.selectedUserId = res.data.rel_users.id
+                })
+        },
+
+        //   isValidEmail(email) {
+        //     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        //     return emailPattern.test(email)
+        //   },
+
+        //   formatNumber() {
+        //     this.model.estudante.telefone = formatPhoneNumber(
+        //       this.model.estudante.telefone
+        //     )
+        //   },
+
+        getAutors() {
+            axios
+                .get('http://127.0.0.1:8000/api/users')
+                .then((res) => {
+                    this.users = res.data
+                })
+                .catch((error) => {
+                    console.error('Erro ao buscar autores: ', error)
+                })
+        },
+
+        async editarLivro() {
+
+            if (
+                !this.model.livro.title ||
+                !this.model.livro.price ||
+                !this.selectedUserId ||
+                !this.model.livro.pages
+            ) {
+                this.errorMessage = 'Por favor, preencha todos os campos!'
+                this.$nextTick(() => {
+                    // this.showToast('errorToast', this.errorMessage)
+                })
+                return
+            }
+
+            try {
+                this.model.livro.id_user = this.selectedUserId
+
+                const payload = {
+                    ...this.model.livro,
+                    autor: this.selectedUserId
+                    
+                }
+                console.log("Id selecionado: ", this.selectedUserId)
+
+                const response = await axios.put(
+                    `http://127.0.0.1:8000/api/books/${this.bookId}/update`,
+                    payload,
+                    
+                )
+                this.successMessage = "Livro atualizado com sucesso!"
+                this.$nextTick(() => {
+                    // this.showToast('successToast', this.successMessage)
+                    setTimeout(() => {
+                        this.$router.push('/livros')
+                    }, 2500)
+                })
+            } catch (error) {
+                console.error('Erro ao adicionar livro', error)
+                this.successMessage = ''
+            }
+        }
+    },
+    // formatPhoneNumber
+}
+</script>

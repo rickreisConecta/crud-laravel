@@ -27,6 +27,13 @@ class BookController extends Controller
         return view('index', ['books' => $books]);
     }
 
+    public function indexApi()
+    {
+        $books = $this->bookRepository->all()->load('relUsers');
+
+        return response()->json($books);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -45,6 +52,14 @@ class BookController extends Controller
         $this->bookRepository->create($data);
 
         return redirect('/books');
+    }
+
+    public function storeApi(BookRequest $request)
+    {
+        $data = $request->only(['title', 'pages', 'price', 'id_user']);
+        $this->bookRepository->create($data);
+
+        return response()->json(data: $data);
     }
 
     /**
@@ -68,15 +83,32 @@ class BookController extends Controller
         return view('editar', ['users' => $users, 'book' => $book, 'selectedUserId' => $selectedUserId]);
     }
 
+    public function editApi(string $id)
+    {
+        $book = $this->bookRepository->find($id)->load('relUsers');
+        $users = $this->objUser->all();
+        $selectedUserId = $book->id_user;
+
+        return response()->json($book);
+    }
+
     /**
      * Update the specified resource in storage.
      */
     public function update(BookRequest $request, string $id)
     {
-        $data = $request->only(['title','pages','price','id_user']);
+        $data = $request->only(['title', 'pages', 'price', 'id_user']);
         $this->bookRepository->update($data, $id);
 
         return redirect('/books');
+    }
+
+    public function updateApi(BookRequest $request, string $id)
+    {
+        $data = $request->only(['title', 'pages', 'price', 'id_user']);
+        $this->bookRepository->update($data, $id);
+
+        return response()->json($data);
     }
 
     /**
@@ -87,5 +119,11 @@ class BookController extends Controller
         $this->bookRepository->delete($id);
 
         return redirect('/books');
+    }
+
+    public function destroyApi(string $id)
+    {
+
+        return  $this->bookRepository->delete($id);;
     }
 }
