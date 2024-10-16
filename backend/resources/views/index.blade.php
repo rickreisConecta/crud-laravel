@@ -37,7 +37,7 @@
                 <td>{{$book -> title}}</td>
                 <td>{{'R$ '.number_format($book -> price, 2, ',', '.')}}</td>
                 <td>{{$user -> name}}</td>
-                <td class="col-4 ">
+                <td class="col-4">
                     <div class="d-flex gap-3">
                         <a href="/books/{{$book->id}}">
                             <button class="btn btn-info">Visualizar</button>

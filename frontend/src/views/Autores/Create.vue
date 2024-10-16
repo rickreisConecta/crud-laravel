@@ -38,11 +38,14 @@
                 </div>
             </div>
 
+            <Toast v-if="showToast" :message="successMessage" :toastType="toastType" />
+
             <div v-if="errorMessage" class="toast-container position-fixed top-0 end-0 text-center">
                 <div id="errorToast" class="toast bg-danger text-white fs-6 me-3 mt-3 custom-toast" role="alert">
                     {{ errorMessage }}
                 </div>
             </div>
+
         </div>
     </div>
 </template>
@@ -50,29 +53,32 @@
 <script>
 import { ref } from 'vue'
 import axios from 'axios';
+import Toast from '../../components/Toast.vue';
 
 export default {
+    components: { Toast },
     name: 'livroCriar',
     setup() {
         const successMessage = ref('')
+        const showToast = ref(false)
+        const toastType = ref('success')
         const errorMessage = ref('')
 
-        function showToast(id, message) {
-            const toastElemment = document.getElementById(id)
+        function displayToast(message, type = 'success') {
+            successMessage.value = message
+            toastType.value = type
+            showToast.value = true
 
-            if (toastElemment) {
-                toastElemment.innerHTML = message
-                const toast = new bootstrap.Toast(toastElemment, {
-                    autohide: true,
-                    delay: 3000
-                })
-                toast.show()
-            }
+            setTimeout(() => {
+                showToast.value = false
+            }, 2500)
         }
         return {
             successMessage,
             errorMessage,
-            showToast
+            showToast,
+            displayToast,
+            toastType
         }
     },
     data() {
@@ -94,10 +100,8 @@ export default {
                 !this.model.autor.email ||
                 !this.model.autor.password
             ) {
-                this.errorMessage = 'Por favor, preencha todos os campos!'
-                this.$nextTick(() => {
-                    this.showToast('errorToast', this.errorMessage)
-                })
+                this.displayToast('Por favor, preencha todos os campos!', 'error')
+
                 return
             }
 
@@ -111,16 +115,9 @@ export default {
                     payload,
 
                 )
-                this.successMessage = "Autor cadastrado com sucesso!"
-                this.$nextTick(() => {
-                    this.showToast('successToast', this.successMessage)
-                    setTimeout(() => {
-                        this.$router.push('/livros')
-                    }, 2500)
-                })
+                this.displayToast('Autor cadastrado com sucesso!', 'success')
             } catch (error) {
                 console.error('Erro ao adicionar autor', error)
-                this.successMessage = ''
             }
         }
     },
