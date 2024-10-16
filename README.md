@@ -1,4 +1,4 @@
-## Projeto Laravel (2)
+## Projeto Laravel
 
 ### Projeto CRUD para estudo de Laravel e PHP
 
