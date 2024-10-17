@@ -1,4 +1,4 @@
-## Projeto Laravel
+## Projeto Laravel e Vue
 
 ### Projeto CRUD para estudo de Laravel e PHP
 
